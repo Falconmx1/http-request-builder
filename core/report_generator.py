@@ -21,7 +21,7 @@ class ReportGenerator:
             output_dir (str): Directorio donde guardar los reportes.
         """
         self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def generate_report(self, results: List[Dict[str, Any]], filename: str = None) -> str:
         """
@@ -79,21 +79,14 @@ class ReportGenerator:
         """Crea el contenido HTML del reporte."""
         # Estilos CSS embebidos
         css = """
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #f4f6f9;
             padding: 20px;
             color: #333;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -101,14 +94,8 @@ class ReportGenerator:
             border-radius: 12px;
             margin-bottom: 30px;
         }
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .header .subtitle {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header .subtitle { opacity: 0.9; font-size: 1.1rem; }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -127,11 +114,7 @@ class ReportGenerator:
             font-weight: bold;
             color: #667eea;
         }
-        .stat-card .label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
+        .stat-card .label { font-size: 0.9rem; color: #666; margin-top: 5px; }
         .stat-card.success .number { color: #10b981; }
         .stat-card.failed .number { color: #ef4444; }
         .stat-card.rate .number { color: #f59e0b; }
@@ -142,10 +125,7 @@ class ReportGenerator:
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        .test-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .test-table table { width: 100%; border-collapse: collapse; }
         .test-table th {
             background: #f8fafc;
             padding: 15px;
@@ -154,13 +134,8 @@ class ReportGenerator:
             color: #475569;
             border-bottom: 2px solid #e2e8f0;
         }
-        .test-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .test-table tr:hover {
-            background: #f8fafc;
-        }
+        .test-table td { padding: 15px; border-bottom: 1px solid #e2e8f0; }
+        .test-table tr:hover { background: #f8fafc; }
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -168,18 +143,8 @@ class ReportGenerator:
             font-size: 0.85rem;
             font-weight: 500;
         }
-        .status-badge.success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        .status-badge.failed {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        .status-badge.pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
+        .status-badge.success { background: #d1fae5; color: #065f46; }
+        .status-badge.failed { background: #fee2e2; color: #991b1b; }
         .response-details {
             max-width: 300px;
             overflow: hidden;
@@ -188,10 +153,7 @@ class ReportGenerator:
             font-size: 0.85rem;
             color: #64748b;
         }
-        .timestamp {
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
+        .timestamp { color: #94a3b8; font-size: 0.85rem; }
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .header h1 { font-size: 1.8rem; }
@@ -234,13 +196,11 @@ class ReportGenerator:
         </head>
         <body>
             <div class="container">
-                <!-- Header -->
                 <div class="header">
                     <h1>🚀 HTTP Request Builder</h1>
                     <div class="subtitle">Reporte de Pruebas - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
                 </div>
 
-                <!-- Stats -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="number">{stats['total']}</div>
@@ -264,7 +224,6 @@ class ReportGenerator:
                     </div>
                 </div>
 
-                <!-- Tabla de Resultados -->
                 <div class="test-table">
                     <table>
                         <thead>
@@ -284,7 +243,6 @@ class ReportGenerator:
                     </table>
                 </div>
 
-                <!-- Footer -->
                 <div style="text-align: center; margin-top: 30px; color: #94a3b8; font-size: 0.85rem;">
                     Generado por HTTP Request Builder v0.1.0
                 </div>
@@ -310,7 +268,6 @@ class ReportGenerator:
             with open(results_file, 'r', encoding='utf-8') as f:
                 results = json.load(f)
 
-            # Si es un solo resultado, convertirlo a lista
             if isinstance(results, dict):
                 results = [results]
 
