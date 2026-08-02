@@ -1,0 +1,35 @@
+{
+  "requests": [
+    {
+      "name": "GitHub API - User",
+      "method": "GET",
+      "url": "https://api.github.com/users/octocat",
+      "headers": {
+        "Accept": "application/vnd.github.v3+json"
+      }
+    },
+    {
+      "name": "JSONPlaceholder - Posts",
+      "method": "GET",
+      "url": "https://jsonplaceholder.typicode.com/posts/1"
+    },
+    {
+      "name": "HTTPBin - POST",
+      "method": "POST",
+      "url": "https://httpbin.org/post",
+      "data": {
+        "name": "Test User",
+        "email": "test@example.com"
+      },
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "name": "Local API - Health Check",
+      "method": "GET",
+      "url": "http://localhost:3000/health",
+      "timeout": 5
+    }
+  ]
+}
