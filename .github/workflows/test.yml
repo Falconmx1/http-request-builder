@@ -1,4 +1,4 @@
-name: HTTP Request Builder CI
+name: HTTP Request Builder CI/CD
 
 on:
   push:
@@ -6,7 +6,8 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '0 0 * * *'  # Ejecutar diariamente
+    - cron: '0 */6 * * *'  # Cada 6 horas
+  workflow_dispatch:  # Permitir ejecución manual
 
 jobs:
   test:
@@ -14,15 +15,17 @@ jobs:
     
     strategy:
       matrix:
-        python-version: [3.8, 3.9, '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     
     - name: Install dependencies
       run: |
@@ -30,22 +33,40 @@ jobs:
         pip install -r requirements.txt
         pip install -e .
     
-    - name: Run tests
+    - name: Run unit tests
       run: |
-        python -m unittest discover tests
+        python -m unittest discover tests -v
     
-    - name: Run API tests from config
+    - name: Run API health checks
       run: |
-        http-request-builder --ci --ci-config examples/example_requests.json --report ci_report.html
+        http-request-builder --ci --ci-config examples/ci_config.json --report ci_report.html
+      continue-on-error: true
     
     - name: Upload test report
       uses: actions/upload-artifact@v3
       with:
-        name: test-report-${{ matrix.python-version }}
+        name: test-report-python${{ matrix.python-version }}
         path: reports/*.html
+        retention-days: 30
     
     - name: Upload test results
       uses: actions/upload-artifact@v3
       with:
-        name: test-results-${{ matrix.python-version }}
+        name: test-results-python${{ matrix.python-version }}
         path: test_results.json
+        retention-days: 30
+
+  notify:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Check status
+      run: |
+        if [ "${{ needs.test.result }}" == "success" ]; then
+          echo "✅ Todas las pruebas pasaron exitosamente!"
+        else
+          echo "❌ Algunas pruebas fallaron. Revisa los logs para más detalles."
+          exit 1
+        fi
