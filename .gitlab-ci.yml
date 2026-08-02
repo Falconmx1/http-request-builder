@@ -1,0 +1,39 @@
+image: python:3.9
+
+stages:
+  - test
+  - report
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+  - pip install -e .
+
+test:
+  stage: test
+  script:
+    - source venv/bin/activate
+    - python -m unittest discover tests
+    - http-request-builder --ci --ci-config examples/example_requests.json --report gitlab_report.html
+  artifacts:
+    paths:
+      - reports/*.html
+      - test_results.json
+    expire_in: 1 week
+
+report:
+  stage: report
+  script:
+    - echo "Reportes generados disponibles en artifacts"
+  artifacts:
+    paths:
+      - reports/*.html
