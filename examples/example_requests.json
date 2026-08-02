@@ -1,35 +1,33 @@
 {
+  "name": "CI/CD Test Suite",
   "requests": [
     {
-      "name": "GitHub API - User",
+      "name": "GitHub API - Health Check",
       "method": "GET",
-      "url": "https://api.github.com/users/octocat",
-      "headers": {
-        "Accept": "application/vnd.github.v3+json"
-      }
+      "url": "https://api.github.com/zen",
+      "timeout": 5,
+      "expected_status": 200
     },
     {
-      "name": "JSONPlaceholder - Posts",
+      "name": "JSONPlaceholder - Test GET",
       "method": "GET",
-      "url": "https://jsonplaceholder.typicode.com/posts/1"
+      "url": "https://jsonplaceholder.typicode.com/posts/1",
+      "timeout": 5,
+      "expected_status": 200
     },
     {
-      "name": "HTTPBin - POST",
+      "name": "HTTPBin - Test POST",
       "method": "POST",
       "url": "https://httpbin.org/post",
       "data": {
-        "name": "Test User",
-        "email": "test@example.com"
+        "test": "ci_cd",
+        "timestamp": "{{timestamp}}"
       },
       "headers": {
         "Content-Type": "application/json"
-      }
-    },
-    {
-      "name": "Local API - Health Check",
-      "method": "GET",
-      "url": "http://localhost:3000/health",
-      "timeout": 5
+      },
+      "timeout": 5,
+      "expected_status": 200
     }
   ]
 }
