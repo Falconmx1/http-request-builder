@@ -9,10 +9,14 @@ Licencia: MIT
 
 import sys
 import json
+import os
+from datetime import datetime
 from core.request import HTTPRequest
 from core.response import HTTPResponse
 from cli.parser import create_parser, parse_headers
 from utils.file_manager import FileManager
+from core.report_generator import ReportGenerator
+from ci.cicd_integration import CICDIntegration
 
 def main():
     """Función principal del programa."""
@@ -24,6 +28,20 @@ def main():
         parser.print_help()
         sys.exit(0)
 
+    # Modo CI/CD: ejecutar pruebas desde archivo de configuración
+    if args.ci_config:
+        results = CICDIntegration.run_tests_from_config(
+            args.ci_config,
+            args.report
+        )
+        exit_code = CICDIntegration.exit_code(results.get('results', []))
+        sys.exit(exit_code)
+
+    # Detectar entorno CI/CD
+    env = CICDIntegration.detect_environment()
+    if args.ci:
+        print(f"🔧 Entorno CI/CD detectado: {env}")
+
     # Cargar configuración si se especifica
     config = {}
     if args.config:
@@ -33,10 +51,8 @@ def main():
     data = None
     if args.data:
         try:
-            # Intentar parsear como JSON
             data = json.loads(args.data)
         except json.JSONDecodeError:
-            # Si falla, usarlo como texto plano
             data = args.data
 
     # Parsear cabeceras
@@ -55,6 +71,18 @@ def main():
     )
 
     response = request.send()
+
+    # Preparar resultado para reportes
+    result_data = {
+        'method': args.method.upper(),
+        'url': args.url,
+        'status_code': response.status_code,
+        'success': response.success,
+        'elapsed_time': response.elapsed_time,
+        'error': response.error_message if response.error_type else None,
+        'body_preview': (response.body[:200] + '...') if response.body and len(response.body) > 200 else response.body,
+        'timestamp': datetime.now().isoformat()
+    }
 
     # Mostrar resultados
     response.display(
@@ -82,11 +110,17 @@ def main():
         )
         print(f"💾 Resultados guardados en: {saved_path}")
 
-    # Salir con código de estado apropiado para scripting
+    # Generar reporte HTML si se solicita
+    if args.report:
+        generator = ReportGenerator()
+        report_file = generator.generate_report([result_data], args.report)
+        print(f"📊 Reporte HTML generado: {report_file}")
+
+    # Salir con código apropiado
     if response.success:
-        sys.exit(0)  # Éxito
+        sys.exit(0)
     else:
-        sys.exit(1)  # Error
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
