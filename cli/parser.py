@@ -11,7 +11,8 @@ def create_parser():
     parser = argparse.ArgumentParser(
         prog="http-request-builder",
         description="Herramienta CLI para probar y depurar APIs REST.",
-        epilog="Ejemplo: python main.py -m GET -u https://api.github.com/users/octocat"
+        epilog="Ejemplo: http-request-builder -m GET -u https://api.github.com/users/octocat",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     # Argumentos principales
@@ -40,6 +41,11 @@ def create_parser():
     )
 
     # Argumentos de configuración
+    parser.add_argument(
+        "-c", "--config",
+        help="Ruta a archivo de configuración JSON con opciones predeterminadas"
+    )
+
     parser.add_argument(
         "-t", "--timeout",
         type=int,
@@ -70,6 +76,18 @@ def create_parser():
         "--no-body",
         action="store_true",
         help="Ocultar el cuerpo de la respuesta"
+    )
+
+    parser.add_argument(
+        "-o", "--output",
+        help="Guardar respuesta en archivo (especificar nombre)"
+    )
+
+    parser.add_argument(
+        "--output-format",
+        choices=["json", "txt", "html"],
+        default="json",
+        help="Formato del archivo de salida (default: json)"
     )
 
     return parser
