@@ -25,7 +25,6 @@ def create_parser():
 
     parser.add_argument(
         "-u", "--url",
-        required=True,
         help="URL del endpoint (ej: https://api.example.com/users)"
     )
 
@@ -88,6 +87,24 @@ def create_parser():
         choices=["json", "txt", "html"],
         default="json",
         help="Formato del archivo de salida (default: json)"
+    )
+
+    # Reportes
+    parser.add_argument(
+        "-r", "--report",
+        help="Generar reporte HTML con los resultados (especificar nombre del archivo)"
+    )
+
+    # CI/CD
+    parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="Activar modo CI/CD para integración con pipelines"
+    )
+
+    parser.add_argument(
+        "--ci-config",
+        help="Ejecutar pruebas desde archivo de configuración (modo CI/CD)"
     )
 
     return parser
