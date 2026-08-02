@@ -5,8 +5,11 @@ Módulo para manejar respuestas HTTP.
 """
 
 import json
-import sys
 from datetime import datetime
+from colorama import init, Fore, Style
+
+# Inicializar colorama para soporte de colores en Windows
+init(autoreset=True)
 
 class HTTPResponse:
     """Clase para encapsular y mostrar una respuesta HTTP."""
@@ -43,52 +46,49 @@ class HTTPResponse:
         return cls(error_type=error_type, error_message=error_message)
 
     def display(self, show_headers=False, show_body=True, verbose=False):
-        """Muestra la respuesta en consola con colores básicos."""
-        # Colores ANSI para terminal
-        GREEN = '\033[92m'
-        RED = '\033[91m'
-        YELLOW = '\033[93m'
-        BLUE = '\033[94m'
-        RESET = '\033[0m'
-        BOLD = '\033[1m'
-
+        """Muestra la respuesta en consola con colores."""
         # Cabecera de la respuesta
-        print("\n" + "=" * 60)
-        print(f"{BOLD}RESPUESTA HTTP{RESET}")
-        print("=" * 60)
+        print("\n" + Fore.CYAN + "=" * 60 + Style.RESET_ALL)
+        print(Fore.CYAN + Style.BRIGHT + "RESPUESTA HTTP" + Style.RESET_ALL)
+        print(Fore.CYAN + "=" * 60 + Style.RESET_ALL)
 
         # Mostrar estado
         if self.error_type:
-            print(f"{RED}❌ ERROR: {self.error_type}{RESET}")
+            print(f"{Fore.RED}❌ ERROR: {self.error_type}{Style.RESET_ALL}")
             print(f"   {self.error_message}")
         else:
-            color = GREEN if self.success else RED
-            status_text = "✅ ÉXITO" if self.success else "❌ FALLO"
-            print(f"{color}{BOLD}Estado: {self.status_code} - {status_text}{RESET}")
-            print(f"{BOLD}Tiempo:{RESET} {self.elapsed_time:.4f} segundos")
+            if self.success:
+                status_color = Fore.GREEN
+                status_text = "✅ ÉXITO"
+            else:
+                status_color = Fore.RED
+                status_text = "❌ FALLO"
+
+            print(f"{status_color}{Style.BRIGHT}Estado: {self.status_code} - {status_text}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Tiempo:{Style.RESET_ALL} {self.elapsed_time:.4f} segundos")
 
         # Mostrar cabeceras
         if show_headers or verbose:
-            print(f"\n{BOLD}📋 Cabeceras:{RESET}")
+            print(f"\n{Fore.CYAN}{Style.BRIGHT}📋 Cabeceras:{Style.RESET_ALL}")
             if self.headers:
                 for key, value in self.headers.items():
-                    print(f"  {BLUE}{key}{RESET}: {value}")
+                    print(f"  {Fore.MAGENTA}{key}{Style.RESET_ALL}: {value}")
             else:
                 print("  (Sin cabeceras)")
 
         # Mostrar cuerpo de la respuesta
         if show_body and not self.error_type:
-            print(f"\n{BOLD}📦 Cuerpo:{RESET}")
+            print(f"\n{Fore.CYAN}{Style.BRIGHT}📦 Cuerpo:{Style.RESET_ALL}")
             if self.json_body is not None:
                 # Mostrar JSON formateado
-                print(json.dumps(self.json_body, indent=2, ensure_ascii=False))
+                print(Fore.WHITE + json.dumps(self.json_body, indent=2, ensure_ascii=False) + Style.RESET_ALL)
             elif self.body:
                 # Truncar si es muy largo
                 body_preview = self.body
                 if len(body_preview) > 2000 and not verbose:
                     body_preview = body_preview[:2000] + "\n... (truncado, usa --verbose para ver completo)"
-                print(body_preview)
+                print(Fore.WHITE + body_preview + Style.RESET_ALL)
             else:
                 print("  (Cuerpo vacío)")
 
-        print("\n" + "=" * 60 + "\n")
+        print(Fore.CYAN + "=" * 60 + Style.RESET_ALL + "\n")
