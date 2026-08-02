@@ -1,0 +1,40 @@
+{
+  "name": "CI/CD Test Suite",
+  "requests": [
+    {
+      "name": "GitHub API - Health Check",
+      "method": "GET",
+      "url": "https://api.github.com/zen",
+      "timeout": 5,
+      "expected_status": 200
+    },
+    {
+      "name": "JSONPlaceholder - Test GET",
+      "method": "GET",
+      "url": "https://jsonplaceholder.typicode.com/posts/1",
+      "timeout": 5,
+      "expected_status": 200
+    },
+    {
+      "name": "HTTPBin - Test POST",
+      "method": "POST",
+      "url": "https://httpbin.org/post",
+      "data": {
+        "test": "ci_cd",
+        "timestamp": "{{timestamp}}"
+      },
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "timeout": 5,
+      "expected_status": 200
+    },
+    {
+      "name": "Test Failure - Invalid URL",
+      "method": "GET",
+      "url": "https://this-domain-does-not-exist-12345.com",
+      "timeout": 3,
+      "expected_status": null
+    }
+  ]
+}
