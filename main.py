@@ -11,6 +11,10 @@ import sys
 import json
 import os
 from datetime import datetime
+
+# Añadir el directorio actual al path para importaciones
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from core.request import HTTPRequest
 from core.response import HTTPResponse
 from cli.parser import create_parser, parse_headers
@@ -46,6 +50,11 @@ def main():
     config = {}
     if args.config:
         config = FileManager.load_config(args.config)
+
+    # Si no hay URL, mostrar ayuda
+    if not args.url:
+        parser.print_help()
+        sys.exit(1)
 
     # Preparar los datos si existen
     data = None
